@@ -1,0 +1,5 @@
+secret:
+  jwt: secret
+
+app:
+  port: 8080

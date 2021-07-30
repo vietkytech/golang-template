@@ -1,0 +1,65 @@
+variables:
+  GITOPS_HELM_FILE: app-backend/multi-rr-svc.yaml
+  UAT_GATEWAY_DOMAIN: gateway.chotot.org
+
+before_script:
+- pwd
+- DIST_NAME=`wsm dist-name`
+- VERSION=`wsm new-versioning`
+- GITOPS_HELM_BRANCH=`echo $CI_BUILD_REF_NAME | awk -F'-' '{print $1}'`
+- echo DIST_NAME=$DIST_NAME
+- echo VERSION=$VERSION
+- echo GITOPS_HELM_BRANCH=$GITOPS_HELM_BRANCH
+
+stages:
+- bump_tag
+- dockerize
+- deploy_uat
+- deploy_production
+
+bump_tag:
+  stage: bump_tag
+  only:
+  - master
+  tags:
+  - shell
+  script:
+  - wsm bump-tag
+
+dockerize:
+  stage: dockerize
+  only:
+  - uat
+  - master
+  script:
+  - docker build -t docker.chotot.org/$DIST_NAME:$VERSION .
+  - docker push docker.chotot.org/$DIST_NAME:$VERSION
+  tags:
+  - shell
+
+deploy_uat:
+  stage: deploy_uat
+  only:
+    refs:
+    - uat
+  tags:
+  - shell
+  script:
+  - >-
+    echo '{
+      "file_path": "'"$GITOPS_HELM_FILE"'",
+      "docker_image_version": "'"$VERSION"'",
+      "branch": "'"$GITOPS_HELM_BRANCH"'"
+    }' | http POST https://$UAT_GATEWAY_DOMAIN/v1/internal/helm-operator/commit --check-status --timeout=300
+
+deploy_production:
+  stage: deploy_production
+  script:
+  - GITOPS_HELM_BRANCH="master"
+  - >-
+    curl -X POST https://gateway.chotot.com/v1/internal/helm-operator/commit -H 'Content-Type: application/json' -d '{ "file_path": "'"$GITOPS_HELM_YAML_FILE"'", "docker_image_version": "'"$VERSION"'", "branch": "'"$GITOPS_HELM_BRANCH"'" }'
+  tags:
+  - shell
+  only:
+  - master
+
