@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package MultiRRProto;
+option go_package = "/proto";
+
+// option swift_prefix = "";
+
+
+service MultiRRSvc {
+    rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+
+    rpc GetRRTemplate (GetRRTemplateRequest) returns (GetRRTemplateResponse);
+    rpc GetAllRRTemplates (GetAllRRTemplatesRequest) returns (GetAllRRTemplatesResponse);
+    rpc CreateRRTemplate (CreateRRTemplateRequest) returns (CreateRRTemplateResponse);
+    rpc UpdateRRTemplate (UpdateRRTemplateRequest) returns (UpdateRRTemplateResponse);
+    rpc DeleteRRTemplate (DeleteRRTemplateRequest) returns (DeleteRRTemplateResponse);
+
+    rpc GetAdsRRs (GetAdsRRsRequest) returns (GetAdsRRsResponse);
+    rpc CheckAdsRRs (CheckAdsRRsRequest) returns (CheckAdsRRsResponse);
+}
+
+//=======================================
+// rpc messages
+//=======================================
+
+message HealthCheckRequest {
+}
+
+message HealthCheckResponse {
+    string msg = 1;
+}
+
+message GetRRTemplateRequest {
+    string id = 1;
+}
+
+message GetRRTemplateResponse {
+    RRTemplate template = 1;
+}
+
+message GetAllRRTemplatesRequest {
+    int32 offset = 1;
+    int32 limit = 2;
+    string query = 3;
+}
+
+message GetAllRRTemplatesResponse {
+    int32 total = 1;
+    repeated RRTemplate templateList = 2;
+}
+
+message CreateRRTemplateRequest {
+    RRTemplate template = 1;
+}
+
+message CreateRRTemplateResponse {
+    string msg = 1;
+}
+
+message UpdateRRTemplateRequest {
+    RRTemplate template = 1;
+}
+
+message UpdateRRTemplateResponse {
+    string msg = 1;
+}
+
+message DeleteRRTemplateRequest {
+    string id = 1;
+}
+
+message DeleteRRTemplateResponse {
+    string msg = 1;
+}
+
+message GetAdsRRsRequest {
+    int64 accountID = 1;
+    AdRRQuery query = 2;
+}
+
+message GetAdsRRsResponse {
+    AdRR resultList = 1;
+}
+
+message CheckAdsRRsRequest {
+    int64 accountID = 1;
+    repeated AdRRQuery queries = 2;
+}
+
+message CheckAdsRRsResponse {
+    repeated AdRR resultList = 1;
+}
+
+message AdRRQuery {
+    int64 adID = 1;
+    int32 actionID = 2;
+}
+
+
+message RRTemplate {
+    string reasonID = 1;
+    string templateValue = 2;
+    bool editable = 3;
+}
+
+message AdRR {
+    int64 adID = 1;
+    int32 actionID = 2;
+    string reasonID = 3;
+    string reasonText = 4;
+    bool editable = 5;
+}
