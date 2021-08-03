@@ -51,7 +51,9 @@ to quickly create a Cobra application.`,
 }
 
 func run(cmd *cobra.Command, args []string) {
-	services.NewRRServer(&config.ConfigMap.GrpcServer)
+	services.NewRRServer(&services.MultiRRConfig{
+		GrpcConfig: &config.ConfigMap.GrpcServer,
+	})
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
