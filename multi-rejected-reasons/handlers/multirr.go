@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/proto/multirr"
 	"git.chotot.org/go-common/kit/logger"
 )
@@ -11,7 +10,6 @@ import (
 var log = logger.GetLogger("multirr-handler")
 
 type MultiRRHandlerConfig struct {
-	GrpcConfig *config.GrpcServerConfig
 }
 
 // MultiRRHandler must be embedded to have forward compatible implementations.

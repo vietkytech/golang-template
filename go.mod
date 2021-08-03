@@ -3,11 +3,17 @@ module git.chotot.org/fse/multi-rejected-reasons
 go 1.14
 
 require (
+	git.chotot.org/go-common/common-lib v0.0.0-20210726091111-418d8d54754d
+	git.chotot.org/go-common/echopprof v0.0.0-20170824031623-e5e646d4449c
+	git.chotot.org/go-common/echoprometheus v0.0.0-20210505081731-dd3c14dbf891
 	git.chotot.org/go-common/kit v1.0.0
-	git.chotot.org/robocop/logger v0.0.0-20170616081301-29df5f83b82c // indirect
+	git.chotot.org/robocop/logger v0.0.0-20170616081301-29df5f83b82c
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/prometheus/client_golang v1.11.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1

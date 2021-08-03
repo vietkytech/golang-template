@@ -1,8 +1,9 @@
-secret:
-  jwt: secret
+jwt:
+  secret: secret
 
-app:
+echo_server:
   port: 8080
+  debug: false
 
 grpc_server:
   network: tcp

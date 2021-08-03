@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = logger.GetLogger("multirr-server")
+var log = logger.GetLogger("multirr-grpc-server")
 
 // MultiRRServer must be embedded to have forward compatible implementations.
 type MultiRRServer struct {

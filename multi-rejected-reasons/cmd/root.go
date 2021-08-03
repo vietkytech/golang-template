@@ -26,6 +26,7 @@ import (
 	"os"
 
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
+	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/echoserver"
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/grpcserver"
 	"github.com/spf13/cobra"
 
@@ -51,6 +52,14 @@ to quickly create a Cobra application.`,
 }
 
 func run(cmd *cobra.Command, args []string) {
+	echoServer := echoserver.NewMultiRREchoServer(&echoserver.MultiRREchoConfig{
+		EchoConfig: &config.ConfigMap.EchoServer,
+		JWTConfig:  &config.ConfigMap.Jwt,
+	})
+	go func() {
+		echoServer.StartServer()
+	}()
+
 	grpcserver.NewRRServer(&config.ConfigMap.GrpcServer)
 }
 

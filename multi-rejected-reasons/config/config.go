@@ -8,17 +8,25 @@ import (
 	"github.com/spf13/viper"
 )
 
+type EchoServerConfig struct {
+	Port  string `mapstructure:"port"`
+	Debug bool   `mapstructure:"debug"`
+}
+
 type GrpcServerConfig struct {
 	Network string `mapstructure:"network"`
 	Address string `mapstructure:"address"`
 }
 
+type JWTConfig struct {
+	Secret string `mapstructure:"secret"`
+}
+
 // Schema schema
 type Schema struct {
-	App struct {
-		Port int `mapstructure:"port"`
-	} `mapstructure:"app"`
+	Jwt        JWTConfig        `mapstructure:"jwt"`
 	GrpcServer GrpcServerConfig `mapstructure:"grpc_server"`
+	EchoServer EchoServerConfig `mapstructure:"echo_server"`
 }
 
 // ConfigMap configmap
