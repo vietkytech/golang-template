@@ -26,7 +26,7 @@ import (
 	"os"
 
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services"
+	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/grpcserver"
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -51,9 +51,7 @@ to quickly create a Cobra application.`,
 }
 
 func run(cmd *cobra.Command, args []string) {
-	services.NewRRServer(&services.MultiRRConfig{
-		GrpcConfig: &config.ConfigMap.GrpcServer,
-	})
+	grpcserver.NewRRServer(&config.ConfigMap.GrpcServer)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
