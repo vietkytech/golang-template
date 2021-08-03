@@ -4,7 +4,8 @@ Multi RR
 
 # run
 - `export GOPRIVATE=git.chotot.org/*`
-- `go run multi-rejected-reasons/main.go`
+- run server `go run multi-rejected-reasons/main.go`
+- run client `go run multi-rejected-reasons/main.go client --address=localhost:8081`
 
 # generating proto
 - `bash multi-rejected-reasons/proto/generate_proto.sh`
