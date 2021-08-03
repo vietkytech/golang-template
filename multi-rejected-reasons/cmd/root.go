@@ -23,8 +23,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
+	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services"
+	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -44,7 +47,11 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	Run: run,
+}
+
+func run(cmd *cobra.Command, args []string) {
+	services.NewRRServer(&config.ConfigMap.GrpcServer)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

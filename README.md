@@ -2,6 +2,9 @@
 
 Multi RR
 
+# run
+- `export GOPRIVATE=git.chotot.org/*`
+- `go run multi-rejected-reasons/main.go`
 
 # generating proto
 - `bash multi-rejected-reasons/proto/generate_proto.sh`

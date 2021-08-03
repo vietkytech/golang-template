@@ -3,3 +3,7 @@ secret:
 
 app:
   port: 8080
+
+grpc_server:
+  network: tcp
+  address: localhost:8081

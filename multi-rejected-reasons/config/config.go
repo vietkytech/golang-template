@@ -8,11 +8,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+type GrpcServerConfig struct {
+	Network string `mapstructure:"network"`
+	Address string `mapstructure:"address"`
+}
+
 // Schema schema
 type Schema struct {
 	App struct {
 		Port int `mapstructure:"port"`
 	} `mapstructure:"app"`
+	GrpcServer GrpcServerConfig `mapstructure:"grpc_server"`
 }
 
 // ConfigMap configmap
@@ -26,6 +32,7 @@ func init() {
 	Config.AddConfigPath("/etc/config/") // Optionally look for config in the working directory.
 	Config.AddConfigPath(".")            // Look for config needed for tests.
 	Config.AddConfigPath("./config")
+	Config.AddConfigPath("./multi-rejected-reasons/config")
 	// Config.AddConfigPath("../config")
 	Config.AddConfigPath("../config/")
 
