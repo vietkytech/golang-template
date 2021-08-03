@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
+	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/handlers"
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/echoserver"
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/grpcserver"
 	"github.com/spf13/cobra"
@@ -63,7 +64,10 @@ func run(cmd *cobra.Command, args []string) {
 		echoServer.StartServer()
 	}()
 
-	grpcserver.NewRRServer(&config.ConfigMap.GrpcServer)
+	grpcserver.NewRRServer(&grpcserver.MultiRRServerConfig{
+		Config:     &handlers.MultiRRHandlerConfig{},
+		GrpcConfig: &config.ConfigMap.GrpcServer,
+	})
 
 	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
 	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
@@ -71,7 +75,7 @@ func run(cmd *cobra.Command, args []string) {
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := echoServer.Shutdown(ctx); err != nil {
 		fmt.Println("echoServer.Shutdown err", err)

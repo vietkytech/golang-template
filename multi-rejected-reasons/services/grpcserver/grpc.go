@@ -12,18 +12,18 @@ import (
 
 var log = logger.GetLogger("multirr-grpc-server")
 
-// MultiRRServer must be embedded to have forward compatible implementations.
-type MultiRRServer struct {
-	handlers.MultiRRHandler
+type MultiRRServerConfig struct {
+	Config     *handlers.MultiRRHandlerConfig
+	GrpcConfig *config.GrpcServerConfig
 }
 
-func NewRRServer(cfg *config.GrpcServerConfig) *MultiRRServer {
-	lis, err := net.Listen(cfg.Network, cfg.Address)
+func NewRRServer(cfg *MultiRRServerConfig) multirr.MultiRRSvcServer {
+	lis, err := net.Listen(cfg.GrpcConfig.Network, cfg.GrpcConfig.Address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	rrserver := &MultiRRServer{}
+	rrserver := handlers.NewRRHandler(cfg.Config)
 	s := grpc.NewServer()
 	multirr.RegisterMultiRRSvcServer(s, rrserver)
 
