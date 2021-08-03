@@ -22,8 +22,11 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"time"
 
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
 	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/echoserver"
@@ -61,6 +64,19 @@ func run(cmd *cobra.Command, args []string) {
 	}()
 
 	grpcserver.NewRRServer(&config.ConfigMap.GrpcServer)
+
+	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
+	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := echoServer.Shutdown(ctx); err != nil {
+		fmt.Println("echoServer.Shutdown err", err)
+		panic(err)
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

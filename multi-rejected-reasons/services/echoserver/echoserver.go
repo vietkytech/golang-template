@@ -34,13 +34,16 @@ type AuthPayload struct {
 type MultiRREchoServer struct {
 	config  *MultiRREchoConfig
 	handler *handlers.MultiRRHandler
+	echo    *echo.Echo
 }
 
 func NewMultiRREchoServer(config *MultiRREchoConfig) *MultiRREchoServer {
 	handler := handlers.NewRRHandler(&handlers.MultiRRHandlerConfig{})
+	e := echo.New()
 	return &MultiRREchoServer{
 		config:  config,
 		handler: handler,
+		echo:    e,
 	}
 }
 
@@ -50,30 +53,33 @@ func (h *MultiRREchoServer) health(ctx echo.Context) error {
 }
 
 func (h *MultiRREchoServer) StartServer() error {
-	e := echo.New()
-	e.Debug = h.config.EchoConfig.Debug
-	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+	h.echo.Debug = h.config.EchoConfig.Debug
+	h.echo.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
 		StackSize: 1 << 10, // 1 KB
 	}))
 
-	echopprof.Wrapper(e)
-	echoprometheus.NewPrometheus("").Use(e)
+	echopprof.Wrapper(h.echo)
+	echoprometheus.NewPrometheus("").Use(h.echo)
 
-	e.HTTPErrorHandler = errorhandler.NewErrorHandler(e.Debug)
+	h.echo.HTTPErrorHandler = errorhandler.NewErrorHandler(h.echo.Debug)
 
 	jwtConfig := middleware.JWTConfig{
 		Claims:     &AuthPayload{},
 		SigningKey: []byte(h.config.JWTConfig.Secret),
 	}
 
-	private := e.Group("/api/v1/private/")
+	private := h.echo.Group("/api/v1/private/")
 	private.Use(middleware.JWTWithConfig(jwtConfig))
 
-	e.GET("/health", h.health)
+	h.echo.GET("/health", h.health)
 
-	err := e.Start(fmt.Sprintf(":%s", h.config.EchoConfig.Port))
+	err := h.echo.Start(fmt.Sprintf(":%s", h.config.EchoConfig.Port))
 	if err != nil {
 		log.Fatalf("Error while starting Echo server: %s", err)
 	}
 	return nil
+}
+
+func (h *MultiRREchoServer) Shutdown(ctx context.Context) error {
+	return h.echo.Shutdown(ctx)
 }
