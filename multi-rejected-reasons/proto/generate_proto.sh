@@ -39,4 +39,4 @@ project_dir=`pwd`
 echo $project_dir
 
 echo "generating proto"
-protoc -I ./ ./*.proto --go_out=plugins=grpc:../
+protoc -I . ./multirr/*.proto --go_out=plugins=grpc:./
