@@ -8,3 +8,12 @@ echo_server:
 grpc_server:
   network: tcp
   address: localhost:8081
+
+email_rabbitmq:
+  address: amqp://admin:ctadmin@10.60.7.124:5672
+  consumer_name: multirr_email_consumer
+  queue_name: multirr.email.consumer
+  route:
+    exchange: ad.event
+    routing_key: ad.refused
+    prefetch_count: 1

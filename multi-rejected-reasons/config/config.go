@@ -22,11 +22,25 @@ type JWTConfig struct {
 	Secret string `mapstructure:"secret"`
 }
 
+type RoutingInfo struct {
+	Exchange      string `mapstructure:"exchange"`
+	RoutingKey    string `mapstructure:"routing_key"`
+	PrefetchCount int    `mapstructure:"prefetch_count"`
+}
+
+type RabbitMQConsumerConfig struct {
+	Address      string      `mapstructure:"address"`
+	ConsumerName string      `mapstructure:"consumer_name"`
+	QueueName    string      `mapstructure:"queue_name"`
+	Route        RoutingInfo `mapstructure:"route"`
+}
+
 // Schema schema
 type Schema struct {
-	Jwt        JWTConfig        `mapstructure:"jwt"`
-	GrpcServer GrpcServerConfig `mapstructure:"grpc_server"`
-	EchoServer EchoServerConfig `mapstructure:"echo_server"`
+	Jwt           JWTConfig              `mapstructure:"jwt"`
+	GrpcServer    GrpcServerConfig       `mapstructure:"grpc_server"`
+	EchoServer    EchoServerConfig       `mapstructure:"echo_server"`
+	EmailRabbitMQ RabbitMQConsumerConfig `mapstructure:"email_rabbitmq"`
 }
 
 // ConfigMap configmap
