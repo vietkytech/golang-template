@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/proto/multirr"
+	"github.com/vietkytech/golang-template/golang-template/proto/multirr"
 	"git.chotot.org/go-common/kit/logger"
 )
 

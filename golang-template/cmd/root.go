@@ -28,11 +28,11 @@ import (
 	"os/signal"
 	"time"
 
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/handlers"
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/echoserver"
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/grpcserver"
 	"github.com/spf13/cobra"
+	"github.com/vietkytech/golang-template/golang-template/config"
+	"github.com/vietkytech/golang-template/golang-template/handlers"
+	"github.com/vietkytech/golang-template/golang-template/services/echoserver"
+	"github.com/vietkytech/golang-template/golang-template/services/grpcserver"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -77,6 +77,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	if err := echoServer.Shutdown(ctx); err != nil {
 		fmt.Println("echoServer.Shutdown err", err)
 		panic(err)

@@ -54,7 +54,7 @@ func init() {
 	Config.AddConfigPath("/etc/config/") // Optionally look for config in the working directory.
 	Config.AddConfigPath(".")            // Look for config needed for tests.
 	Config.AddConfigPath("./config")
-	Config.AddConfigPath("./multi-rejected-reasons/config")
+	Config.AddConfigPath("./golang-template/config")
 	// Config.AddConfigPath("../config")
 	Config.AddConfigPath("../config/")
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
+	"github.com/vietkytech/golang-template/golang-template/config"
 	"git.chotot.org/go-common/kit/logger"
 	"github.com/streadway/amqp"
 )
@@ -15,7 +15,7 @@ var log = logger.GetLogger("multirr-rabbitmq")
 type HandleMessage func([]byte) error
 
 type RabbitMQConsumerConfig struct {
-	Consumer *config.RabbitMQConsumerConfig
+	Consumer *config.RabbitMQConfig
 }
 
 type RabbitMQConsumer struct {
@@ -43,11 +43,14 @@ func (c *RabbitMQConsumer) Consume(handle HandleMessage) error {
 
 	q, err := ch.QueueDeclare(
 		c.Config.Consumer.ConsumerName, // name
-		false,                          // durable
+		true,                           // durable
 		false,                          // delete when unused
 		false,                          // exclusive
 		false,                          // no-wait
-		nil,                            // arguments
+		amqp.Table{
+			"x-dead-letter-exchange":    c.Config.Consumer.Route.Exchange,
+			"x-dead-letter-routing-key": fmt.Sprintf("%s.dlx", c.Config.Consumer.ConsumerName),
+		}, // arguments
 	)
 	if err != nil {
 		return fmt.Errorf("Failed to declare a queue: %+v", err)
@@ -60,6 +63,16 @@ func (c *RabbitMQConsumer) Consume(handle HandleMessage) error {
 	)
 	if err != nil {
 		return fmt.Errorf("Failed to set QoS: %+v", err)
+	}
+
+	err = ch.QueueBind(
+		q.Name,                             // queue name
+		c.Config.Consumer.Route.RoutingKey, // routing key
+		c.Config.Consumer.Route.Exchange,   // exchange
+		false,
+		nil)
+	if err != nil {
+		return fmt.Errorf("Failed to bind queue: %+v", err)
 	}
 
 	msgs, err := ch.Consume(
@@ -80,7 +93,7 @@ func (c *RabbitMQConsumer) Consume(handle HandleMessage) error {
 			err := handle(d.Body)
 			if err != nil {
 				log.Errorf("Can't handle message %+v", err)
-				d.Reject(true)
+				d.Reject(false)
 				continue
 			}
 

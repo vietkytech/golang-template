@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/cmd"
+import "github.com/vietkytech/golang-template/golang-template/cmd"
 
 func main() {
 	cmd.Execute()

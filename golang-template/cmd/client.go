@@ -22,16 +22,21 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
+	"context"
+	"time"
 
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/config"
-	"git.chotot.org/fse/multi-rejected-reasons/multi-rejected-reasons/services/rabbitmq"
+	"git.chotot.org/go-common/kit/logger"
 	"github.com/spf13/cobra"
+	"github.com/vietkytech/golang-template/golang-template/config"
+	"github.com/vietkytech/golang-template/golang-template/proto/multirr"
+	"google.golang.org/grpc"
 )
 
-// emailConsumerCmd represents the emailConsumer command
-var emailConsumerCmd = &cobra.Command{
-	Use:   "emailConsumer",
+var log = logger.GetLogger("client")
+
+// clientCmd represents the client command
+var clientCmd = &cobra.Command{
+	Use:   "client",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -39,29 +44,42 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: runEmailConsumerClient,
+	Run: runClient,
 }
 
-func runEmailConsumerClient(cmd *cobra.Command, args []string) {
-	consumer := rabbitmq.NewRabbitMQConsumer(&rabbitmq.RabbitMQConsumerConfig{
-		Consumer: &config.ConfigMap.EmailRabbitMQ,
-	})
-	consumer.Consume(func(v []byte) error {
-		fmt.Println("v", string(v))
-		return nil
-	})
+func runClient(cmd *cobra.Command, args []string) {
+	address := cmd.Flag("address").Value.String()
+	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	callHealthcheck(conn)
+}
+
+func callHealthcheck(conn *grpc.ClientConn) {
+	// call health check
+	c := multirr.NewMultiRRSvcClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.HealthCheck(ctx, &multirr.HealthCheckRequest{})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	log.Infof("Healthcheck: %s", r.GetMsg())
 }
 
 func init() {
-	rootCmd.AddCommand(emailConsumerCmd)
+	rootCmd.AddCommand(clientCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// emailConsumerCmd.PersistentFlags().String("foo", "", "A help for foo")
+	clientCmd.PersistentFlags().String("address", config.ConfigMap.GrpcServer.Address, "specify grpc server ddress")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// emailConsumerCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// clientCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
